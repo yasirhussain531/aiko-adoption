@@ -21,12 +21,12 @@ npm run build
 
 Open [`src/App.jsx`](src/App.jsx) and update the `createCarouselImages` function with your own image URLs and alt text.
 
-### Discord DM notification
+### Automatic adoption email
 
-When someone agrees to adopt, the app posts `"Yes the cat have been adopted"` straight to your Discord DMs via a backend endpoint of your choosing. Expose that endpoint to the client by creating a `.env` file with:
+When someone agrees to adopt, the app calls a backend endpoint that sends an email on your behalf—no email client redirect required. Expose that endpoint to the client by creating a `.env` file with:
 
 ```
-VITE_DISCORD_DM_ENDPOINT=https://your-service.example.com/discord-dm
+VITE_ADOPTION_EMAIL_ENDPOINT=https://your-service.example.com/send-email
 ```
 
-The endpoint should accept a JSON payload shaped like `{ "message": "Yes the cat have been adopted" }` and forward it to your personal Discord account (for example, by using a serverless function with a Discord bot token). If the endpoint is unreachable or misconfigured, the modal will display an inline error so you can retry after fixing the setup.
+The endpoint should accept a JSON payload shaped like `{ "subject": "Yes, the cat has been adopted!", "body": "Great news! Someone just agreed to adopt the cat. Please reach out to coordinate the essentials." }` and deliver the email (for example, with Nodemailer, SendGrid, or AWS SES). If the endpoint is unreachable or misconfigured, the modal will display an inline error so you can retry after fixing the setup.

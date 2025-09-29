@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 
-const DISCORD_DM_ENDPOINT = import.meta.env.VITE_DISCORD_DM_ENDPOINT;
-const DISCORD_DM_MESSAGE = 'Yes the cat have been adopted';
+const ADOPTION_EMAIL_ENDPOINT = import.meta.env.VITE_ADOPTION_EMAIL_ENDPOINT;
+const ADOPTION_EMAIL_SUBJECT = 'Yes, the cat has been adopted!';
+const ADOPTION_EMAIL_BODY =
+  'Great news! Someone just agreed to adopt the cat. Please reach out to coordinate the essentials.';
 
 const createCarouselImages = () => [
   {
@@ -23,8 +25,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeModal, setActiveModal] = useState(null);
-  const [discordStatus, setDiscordStatus] = useState('idle');
-  const [discordError, setDiscordError] = useState('');
+  const [emailStatus, setEmailStatus] = useState('idle');
+  const [emailError, setEmailError] = useState('');
 
   const catImages = useMemo(() => createCarouselImages(), []);
 
@@ -44,34 +46,37 @@ function App() {
     setCurrentIndex((index) => (index === catImages.length - 1 ? 0 : index + 1));
   };
 
-  const notifyDiscord = async () => {
-    if (!DISCORD_DM_ENDPOINT) {
-      throw new Error('Missing VITE_DISCORD_DM_ENDPOINT environment variable');
+  const sendAdoptionEmail = async () => {
+    if (!ADOPTION_EMAIL_ENDPOINT) {
+      throw new Error('Missing VITE_ADOPTION_EMAIL_ENDPOINT environment variable');
     }
 
-    const response = await fetch(DISCORD_DM_ENDPOINT, {
+    const response = await fetch(ADOPTION_EMAIL_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: DISCORD_DM_MESSAGE }),
+      body: JSON.stringify({
+        subject: ADOPTION_EMAIL_SUBJECT,
+        body: ADOPTION_EMAIL_BODY,
+      }),
     });
 
     if (!response.ok) {
-      throw new Error('Discord notification failed');
+      throw new Error('Email notification failed');
     }
   };
 
   const handleYesClick = async () => {
     setActiveModal('yes');
-    setDiscordStatus('pending');
-    setDiscordError('');
+    setEmailStatus('pending');
+    setEmailError('');
 
     try {
-      await notifyDiscord();
-      setDiscordStatus('success');
+      await sendAdoptionEmail();
+      setEmailStatus('success');
     } catch (error) {
-      setDiscordStatus('error');
-      setDiscordError(error.message);
-      console.error('Failed to send Discord DM', error);
+      setEmailStatus('error');
+      setEmailError(error.message);
+      console.error('Failed to send adoption email', error);
     }
   };
 
@@ -81,8 +86,8 @@ function App() {
 
   const closeModal = () => {
     setActiveModal(null);
-    setDiscordStatus('idle');
-    setDiscordError('');
+    setEmailStatus('idle');
+    setEmailError('');
   };
 
   if (isLoading) {
@@ -173,12 +178,12 @@ function App() {
                   thing and that is your love.
                 </p>
                 <div className="modal__status" role="status">
-                  {discordStatus === 'pending' && 'Letting Yasir know on Discord...'}
-                  {discordStatus === 'success' && 'Message delivered straight to Yasir\'s DMs. 💌'}
-                  {discordStatus === 'error' && (
+                  {emailStatus === 'pending' && 'Sending the adoption email to Yasir...'}
+                  {emailStatus === 'success' && "Email delivered! Yasir knows the cat's been adopted. 💌"}
+                  {emailStatus === 'error' && (
                     <span>
-                      We couldn&apos;t reach Discord. Please check your configuration and try again.
-                      {discordError ? ` (${discordError})` : ''}
+                      We couldn&apos;t send the email. Please check your configuration and try again.
+                      {emailError ? ` (${emailError})` : ''}
                     </span>
                   )}
                 </div>
