@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 
 const ADOPTION_EMAIL_ENDPOINT = import.meta.env.VITE_ADOPTION_EMAIL_ENDPOINT;
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 const ADOPTION_EMAIL_SUBJECT = 'Yes, the cat has been adopted!';
 const ADOPTION_EMAIL_BODY =
   'Great news! Someone just agreed to adopt the cat. Please reach out to coordinate the essentials.';
@@ -47,22 +50,48 @@ function App() {
   };
 
   const sendAdoptionEmail = async () => {
-    if (!ADOPTION_EMAIL_ENDPOINT) {
-      throw new Error('Missing VITE_ADOPTION_EMAIL_ENDPOINT environment variable');
+    if (ADOPTION_EMAIL_ENDPOINT) {
+      const response = await fetch(ADOPTION_EMAIL_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: ADOPTION_EMAIL_SUBJECT,
+          body: ADOPTION_EMAIL_BODY,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Email notification failed');
+      }
+
+      return;
     }
 
-    const response = await fetch(ADOPTION_EMAIL_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        subject: ADOPTION_EMAIL_SUBJECT,
-        body: ADOPTION_EMAIL_BODY,
-      }),
-    });
+    if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: EMAILJS_SERVICE_ID,
+          template_id: EMAILJS_TEMPLATE_ID,
+          user_id: EMAILJS_PUBLIC_KEY,
+          template_params: {
+            subject: ADOPTION_EMAIL_SUBJECT,
+            message: ADOPTION_EMAIL_BODY,
+          },
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error('Email notification failed');
+      if (!response.ok) {
+        throw new Error('EmailJS notification failed');
+      }
+
+      return;
     }
+
+    throw new Error(
+      'Missing adoption notification configuration. Set VITE_ADOPTION_EMAIL_ENDPOINT or the EmailJS environment variables.'
+    );
   };
 
   const handleYesClick = async () => {
