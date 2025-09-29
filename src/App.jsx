@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 
+
 const ADOPTION_EMAIL_ENDPOINT = import.meta.env.VITE_ADOPTION_EMAIL_ENDPOINT;
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -8,6 +9,9 @@ const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 const ADOPTION_EMAIL_SUBJECT = 'Yes, the cat has been adopted!';
 const ADOPTION_EMAIL_BODY =
   'Great news! Someone just agreed to adopt the cat. Please reach out to coordinate the essentials.';
+
+const EMAIL_ADDRESS = 'adoptions@example.com';
+
 
 const createCarouselImages = () => [
   {
@@ -27,9 +31,12 @@ const createCarouselImages = () => [
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+
   const [activeModal, setActiveModal] = useState(null);
   const [emailStatus, setEmailStatus] = useState('idle');
   const [emailError, setEmailError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
 
   const catImages = useMemo(() => createCarouselImages(), []);
 
@@ -48,6 +55,7 @@ function App() {
   const goToNext = () => {
     setCurrentIndex((index) => (index === catImages.length - 1 ? 0 : index + 1));
   };
+
 
   const sendAdoptionEmail = async () => {
     if (ADOPTION_EMAIL_ENDPOINT) {
@@ -119,6 +127,18 @@ function App() {
     setEmailError('');
   };
 
+  const handleYesClick = () => {
+    const subject = encodeURIComponent('Cat Adoption Confirmation');
+    const body = encodeURIComponent('Yes, the cat has been adopted!');
+    window.location.href = `mailto:${EMAIL_ADDRESS}?subject=${subject}&body=${body}`;
+  };
+
+  const handleNoClick = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => setShowModal(false);
+
   if (isLoading) {
     return (
       <div className="loader" role="status" aria-live="polite">
@@ -185,6 +205,7 @@ function App() {
         </button>
       </div>
 
+
       {activeModal && (
         <div className="modal" role="dialog" aria-modal="true" aria-labelledby="catModalTitle">
           <div
@@ -226,6 +247,19 @@ function App() {
                 <p>Don&apos;t worry about me, I know the purrfect family is still out there.</p>
               </>
             )}
+
+      {showModal && (
+        <div className="modal" role="dialog" aria-modal="true" aria-labelledby="sadCatTitle">
+          <div className="modal__content">
+            <button type="button" className="modal__close" onClick={closeModal} aria-label="Close">
+              ×
+            </button>
+            <div className="modal__emoji" role="img" aria-hidden="true">
+              😿
+            </div>
+            <h2 id="sadCatTitle">It&apos;s okay, I&apos;ll find a new home.</h2>
+            <p>Don&apos;t worry about me, I know the purrfect family is still out there.</p>
+
           </div>
         </div>
       )}

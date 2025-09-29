@@ -21,19 +21,6 @@ npm run build
 
 Open [`src/App.jsx`](src/App.jsx) and update the `createCarouselImages` function with your own image URLs and alt text.
 
-### Automatic adoption email
-
-When someone agrees to adopt, the app attempts to deliver an email on your behalf—no email client redirect required. You have two options:
-
-#### 1. Use your own backend (any provider)
-
-Expose a server endpoint through a `.env` file:
-
-```
-VITE_ADOPTION_EMAIL_ENDPOINT=https://your-service.example.com/send-email
-```
-
-Your endpoint should accept `{ "subject": "Yes, the cat has been adopted!", "body": "Great news! Someone just agreed to adopt the cat. Please reach out to coordinate the essentials." }` and send the email via your favourite provider (Nodemailer, SendGrid, AWS SES, etc.). If the endpoint is unreachable or misconfigured, the happy modal will report the failure so you can retry after fixing the setup.
 
 #### 2. Use a free EmailJS account (no backend required)
 
@@ -51,3 +38,4 @@ EmailJS offers a generous free tier that lets you send emails directly from the 
    ```
 
 The app will automatically detect these values and send the adoption confirmation through EmailJS. You can customise the template to include additional context (for example, the adopter's IP or timestamp) using the variables provided in `template_params` within [`src/App.jsx`](src/App.jsx).
+=======
