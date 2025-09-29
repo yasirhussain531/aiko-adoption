@@ -160,6 +160,18 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
+
+.modal__content--happy {
+  border: 3px solid rgba(255, 154, 158, 0.4);
+  background: linear-gradient(180deg, rgba(255, 250, 240, 0.95), rgba(255, 244, 247, 0.98));
+}
+
+.modal__content--comfort {
+  border: 3px solid rgba(102, 166, 255, 0.35);
+  background: linear-gradient(180deg, rgba(241, 248, 255, 0.95), rgba(228, 237, 255, 0.98));
+}
+
+
 .modal__close {
   position: absolute;
   top: 0.75rem;
@@ -176,6 +188,15 @@
   font-size: 3.5rem;
   margin-bottom: 1rem;
 }
+
+
+.modal__status {
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+  color: rgba(46, 42, 59, 0.8);
+  min-height: 1.4em;
+}
+
 
 .loader {
   min-height: 100vh;

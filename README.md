@@ -21,6 +21,21 @@ npm run build
 
 Open [`src/App.jsx`](src/App.jsx) and update the `createCarouselImages` function with your own image URLs and alt text.
 
-### Adoption email recipient
 
-The adoption confirmation email uses the `mailto:` protocol. Update the `EMAIL_ADDRESS` constant in [`src/App.jsx`](src/App.jsx) with the inbox that should receive confirmation emails.
+#### 2. Use a free EmailJS account (no backend required)
+
+EmailJS offers a generous free tier that lets you send emails directly from the browser. After creating an account:
+
+1. Create an email service (choose your email provider) and note the **Service ID**.
+2. Create an email template with `{{subject}}` and `{{message}}` variables.
+3. Copy your **Template ID** and **Public Key** from the EmailJS dashboard.
+4. Create a `.env` file with:
+
+   ```
+   VITE_EMAILJS_SERVICE_ID=your_service_id
+   VITE_EMAILJS_TEMPLATE_ID=your_template_id
+   VITE_EMAILJS_PUBLIC_KEY=your_public_key
+   ```
+
+The app will automatically detect these values and send the adoption confirmation through EmailJS. You can customise the template to include additional context (for example, the adopter's IP or timestamp) using the variables provided in `template_params` within [`src/App.jsx`](src/App.jsx).
+=======
